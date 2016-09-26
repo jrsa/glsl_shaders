@@ -31,27 +31,24 @@ vec3 hsv2rgb(vec3 color) {
 
 void main() {
     vec2 tc = pos.st;
-    tc *= mat2(0.499, 0.0, 0.0, 0.499);
+    tc *= mat2(0.5, 0.0, 0.0, 0.5);
     tc += vec2(0.5);
 
     vec3 pixel = texture(shampler, tc).rgb;
 
     vec3 s = rgb2hsv(pixel);
 
-    mat2 sca = mat2(1.-s.r, 0., 0., 1. - s.r);
+    mat2 sca = mat2(1.- (s.r*1.05), 0., 0., 1. - (s.r*1.05));
 
-    float angle = 0.05;
+    float angle = 0.005 * s.b;
 	mat2 rot = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
     vec2 offs = vec2(1. / dims.x, 1. / dims.y);
-
-    float width = 1.9;
-
-	offs *= mat2(cos(angle), sin(width), -sin(width), cos(angle));
 
     tc *= sca;
     tc *= rot;
     vec2 src = tc;
 
+    float width = 2.980;
     vec2 tc4 = src;
     vec2 tc1 = src + vec2(0.0, -offs.t * width);
     vec2 tc3 = src + vec2(-offs.s * width, 0.0);
@@ -74,25 +71,11 @@ void main() {
     vec4 col8 = texture(shampler, tc8);
 
     // pass transformed pixel out with no convolution
-//    color = vec4(pixel, 1.0);
-    s.r+=0.0169;
-
-    vec2 pos_factor = pos.yx;
-    pos_factor *= mat2(0.0, 1.0, 1.0, 0.0);
-    pos_factor *= rot;
-//    pos_factor += vec2(s.r-0.376);
-//    pos_factor.x -= 1.4;
-    float d = dot(vec4(pos_factor, pos.zw), vec4(s, 0.23));
-    d *= dot(vec4(pos_factor, pos.zw), vec4(s*3.50, 1.0));
-
-//     float d = pos.x + 0.99;
-//    d*= 1.9;
-//    s.r += (d * 0.04);
-//    s.r -= (d * 0.4);
-//    color = vec4(hsv2rgb(s), 1.0);
-//    color = col2 + col4 + col6 + col8 + col0 * 0.1;
-//    color = vec4(hsv2rgb(s), 1.0) * (6.3*d) - (col1 + col3 + col5 + col7);
-
-    color += vec4(hsv2rgb(s), 1.0) * (d*3.0*(0.1*dot())) - (col1 + col3 + col5 + col7);
-    color += 0.2*(-s.g);
+//    color = col4;
+    s.r+=0.003;
+    s.s-=dot(pos, vec4(s, 1.0));
+    s.r-=dot(pos, vec4(s, 1.0));
+    color = vec4(hsv2rgb(s), 1.0);
+//    color = col2 + col4 + col6 + col8 + col0 * 0.2;
+//    color = col4 * 4.0 - (col1 + col3 + col5 + col7);
 }

@@ -25,7 +25,7 @@ vec3 hsv2rgb(vec3 color) {
 
 void main(void){
 
-    vec3 noisePixel = noise3(pos.xyz * 5.0);
+    vec3 noisePixel = noise3(pos.xyz * scale) + 0.7;
     vec3 hsvNoisePixel = rgb2hsv(noisePixel);
 
     hsvNoisePixel.r *= 0.5;
