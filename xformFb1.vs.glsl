@@ -9,24 +9,14 @@ out vec2 outVelocity;
 
 uniform float time;
 uniform vec2 mousePos;
-uniform usampler2D depth;
+//uniform usampler2D depth;
 
 void main() {
+    vec2 mousePos = mousePos/100;
     vec2 newVelocity = originalPos - position;
-    vec2 tc = -originalPos;
 
-    tc *= mat2(0.5, 0.0, 0.0, 0.5);
-    tc += vec2(0.5); 
-
-    uvec4 depth_pixel = texture(depth, tc);
-    float d = float(depth_pixel.r) / 32768;
-
-    //if (length(mousePos - originalPos) < 0.75f) {
-    //    vec2 acceleration = 1.5f * normalize(mousePos - position);
-    //    newVelocity = velocity + acceleration * time;
-    //}
-    if (d > 0.05f && d < 0.4f) {
-        vec2 acceleration = 2.0f * normalize(position);
+    if (length(mousePos - originalPos) < 0.75f) {
+        vec2 acceleration = 1.5f * normalize(mousePos - position);
         newVelocity = velocity + acceleration * time;
     }
 
@@ -34,14 +24,9 @@ void main() {
         newVelocity = normalize(newVelocity);
     }
 
-    vec2 newPosition = position + newVelocity * time;
+    vec2 newPosition = position + newVelocity * (time*0.1);
 
     outPosition = newPosition;
     outVelocity = newVelocity;
     gl_Position = vec4(newPosition, 0.0, 1.0);
-
-    // debug only
-    //outPosition = originalPos;
-    //outVelocity = vec2(d, 0.0);
-    //gl_Position = vec4(originalPos, 0.0, 1.0);
 }
