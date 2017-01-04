@@ -93,6 +93,8 @@ void main() {
 //    color = col2 + col4 + col6 + col8 + col0 * 0.1;
 //    color = vec4(hsv2rgb(s), 1.0) * (6.3*d) - (col1 + col3 + col5 + col7);
 
-    color += vec4(hsv2rgb(s), 1.0) * (d*2.5) - (col1 + col3 + col5 + col7);
+    float amp = 1.0;
+    // float amp = 18.0;
+    color += vec4(hsv2rgb(s), 1.0) * (d*2.5) - ((col1 + col3 + col5 + col7) / amp);
     //color += 0.2*(-s.g);
 }
