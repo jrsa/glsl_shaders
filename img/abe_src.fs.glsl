@@ -4,6 +4,7 @@ in vec4 pos;
 out vec4 color;
 
 uniform float scale;
+uniform float hue;
 
 vec3 rgb2hsv(vec3 color) {
     vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -32,5 +33,5 @@ void main(void){
     // hsvNoisePixel.r += 0.35;
 
     // noisePixel=  hsv2rgb(hsvNoisePixel);
-    color = vec4(1.0, 0.0, 0.0, 1.0);
+    color = vec4(hsv2rgb(vec3(hue, 1.0, 1.0)), 1.0);
 }
