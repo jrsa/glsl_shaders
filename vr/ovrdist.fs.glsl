@@ -55,7 +55,7 @@ void main()
         color += textureLod(Texture0, texSample2, 0.0).rgb;
         count = count + 2.0;
     }
-    // FragColor = vec4(color / count, 1);
-    FragColor = vec4(1, 0.4, 0.8, 1);
+    FragColor = vec4(color / count, 1);
+    // FragColor = vec4(1, 0.4, 0.8, 1);
 }
 
