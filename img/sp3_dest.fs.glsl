@@ -31,25 +31,24 @@ vec3 hsv2rgb(vec3 color) {
 
 void main() {
     vec2 tc = pos.st;
-    tc *= mat2(0.499, 0.0, 0.0, 0.499);
+    tc *= mat2(0.5, 0.0, 0.0, 0.5);
     tc += vec2(0.5);
 
     vec3 pixel = texture(shampler, tc).rgb;
-
     vec3 pixel_hsv = rgb2hsv(pixel);
 
-    mat2 sca = mat2(1.+pixel_hsv.r, 0., 0., 1. + pixel_hsv.r);
+    mat2 sca = mat2(1. + pixel_hsv.g, 0., 0., 1. + pixel_hsv.r);
 
-    float angle = 0.05 * pixel_hsv.r;
+    float angle = 0.05 * pixel_hsv.g;
 	mat2 rot = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+
     vec2 offs = vec2(1. / dims.x, 1. / dims.y);
-
-//    float width = 1. + width;
-
 	offs *= mat2(cos(angle), sin(width), -sin(width), cos(angle));
 
+    float width = 1. + width;
+
     tc *= sca;
-//    tc *= rot;
+    tc *= rot;
     vec2 src = tc;
 
     vec2 tc4 = src;
@@ -63,38 +62,40 @@ void main() {
     vec2 tc6 = src + vec2(-offs.s * width, offs.t * width);
     vec2 tc8 = src + vec2(offs.s * width, offs.t * width);
 
-    vec4 col0 = texture(shampler, tc0);
     vec4 col1 = texture(shampler, tc1);
-    vec4 col2 = texture(shampler, tc2);
     vec4 col3 = texture(shampler, tc3);
-    vec4 col4 = texture(shampler, tc4);
     vec4 col5 = texture(shampler, tc5);
-    vec4 col6 = texture(shampler, tc6);
     vec4 col7 = texture(shampler, tc7);
-    vec4 col8 = texture(shampler, tc8);
 
-    // pass transformed pixel out with no convolution
-//    color = vec4(pixel, 1.0);
-    pixel_hsv.r+=0.0169;
+    pixel_hsv.r += 0.0169;
 
     vec2 pos_factor = pos.yx;
-    //pos_factor *= mat2(.5, 0.0, 0.0, .5);
-    pos_factor *= rot;
+    float shrink = 1.3;
+    pos_factor -= shrink;
+    pos_factor *= mat2(shrink, 0.0, 0.0, shrink);
+    pos_factor += shrink;
+
+    // angle = 0.0;
+    // pos_factor *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+
     //pos_factor += vec2(pixel_hsv.r-0.376);
     //pos_factor.x -= 1.4;
+
     float d = dot(vec4(pos_factor, pos.zw), vec4(pixel_hsv, 0.23));
     d *= dot(vec4(pos_factor, pos.zw), vec4(pixel_hsv*3.50, 1.0));
 
 //     float d = pos.y + 1.39;
     d*= 1.9;
-    pixel_hsv.r += (d * 0.04);
-//    pixel_hsv.r -= (d * 0.4);
+    pixel_hsv.r += (d * 0.004);
+   // pixel_hsv.r -= (d * 0.4);
 //    color = vec4(hsv2rgb(pixel_hsv), 1.0);
 //    color = col2 + col4 + col6 + col8 + col0 * 0.1;
 //    color = vec4(hsv2rgb(pixel_hsv), 1.0) * (6.3*d) - (col1 + col3 + col5 + col7);
 
-    float amp = 23.0;
-    // float amp = 18.0;
+    // float amp = 1.0;
+    float amp = 24.0;
     color += vec4(hsv2rgb(pixel_hsv), 1.0) * (d*2.5) - ((col1 + col3 + col5 + col7) / amp);
-    //color += 0.2*(-pixel_hsv.g);
+    // color += 0.2*(-pixel_hsv.g);
+
+    // color = vec4(pos_factor.x, pos_factor.y, 0.5, 1.0);
 }

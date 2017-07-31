@@ -40,16 +40,16 @@ void main() {
     // hsv.r += (hsv.g * 0.2) + 0.7;
 
     // saturation
-    hsv.g = 1.;
+    // hsv.g = 1.;
 
-    hsv.r *= 0.7;
-    hsv.r += 0.7;
+    // hsv.r *= 0.7;
+    // hsv.r += 0.7;
     
     // value
-    hsv.b *= 1.0;
+    // hsv.b *= 1.0;
 
-    color = vec4(hsv2rgb(hsv), 0.0);
-    color = vec4(1.0) - color;
+    color = vec4(hsv2rgb(hsv), 1.0);
+    // color = vec4(1.0) - color;
     // color = src;
     // color = vec4(0.0);
 }

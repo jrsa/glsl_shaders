@@ -40,7 +40,7 @@ void main() {
     angle *= 0.25;
 
     float xscale = 1. + (-s.r * 0.0009);
-    float yscale = 1. + (s.g  * 0.0009);
+    float yscale = 1. + ( s.g * 0.0009);
 
     tc -= vec2(0.5);
     tc *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));

@@ -37,9 +37,14 @@ void main() {
     vec3 hsv = rgb2hsv(srcpixel.rgb);
 
     hsv.r += (hsv.b * 0.01);
-    hsv.r = mod(hsv.r, 1.0);
-    hsv.g += (srcpixel.b * 0.01);
-    hsv.b += 0.01;
+
+    // doesnt seem to matter
+    // hsv.r = mod(hsv.r, 1.0);
+
+    // added later, can maintain motion but loses detail
+    // without these, everything fades away
+    // hsv.g += (srcpixel.b * 0.01);
+    // hsv.b += 0.01;
 
     color = vec4(hsv2rgb(hsv), srcpixel.a);
 }

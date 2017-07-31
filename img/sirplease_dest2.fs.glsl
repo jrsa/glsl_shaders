@@ -29,15 +29,15 @@ void main() {
     vec2 tc6 = src + vec2(-offs.s * width, offs.t * width);
     vec2 tc8 = src + vec2(offs.s * width, offs.t * width);
 
-    vec4 col0 = texture(shampler, tc0);
+    // vec4 col0 = texture(shampler, tc0);
     vec4 col1 = texture(shampler, tc1);
-    vec4 col2 = texture(shampler, tc2);
+    // vec4 col2 = texture(shampler, tc2);
     vec4 col3 = texture(shampler, tc3);
     vec4 col4 = texture(shampler, tc4);
     vec4 col5 = texture(shampler, tc5);
-    vec4 col6 = texture(shampler, tc6);
+    // vec4 col6 = texture(shampler, tc6);
     vec4 col7 = texture(shampler, tc7);
-    vec4 col8 = texture(shampler, tc8);
+    // vec4 col8 = texture(shampler, tc8);
 
     // pass transformed pixel out with no convolution
 //    color = col4;
