@@ -5,11 +5,12 @@ out vec4 color;
 
 uniform vec2 dims;
 uniform float width;
-//uniform float amp;
-uniform float scaleCoef;
 
 uniform sampler2D shampler;
 
+// -----------------------------------------------------
+// functions to transform RGV to HSV and back
+// -----------------------------------------------------
 vec3 rgb2hsv(vec3 c) {
     vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
     vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
@@ -20,7 +21,6 @@ vec3 rgb2hsv(vec3 c) {
     return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
-
 vec3 hsv2rgb(vec3 color) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
     vec3 p = abs(fract(color.xxx + K.xyz) * 6.0 - K.www);
@@ -30,57 +30,65 @@ vec3 hsv2rgb(vec3 color) {
 }
 
 void main() {
+    // -----------------------------------------------------
+    // get texcoords, (0 to 1) from positions, (-1 to 1)
+    // -----------------------------------------------------
     vec2 tc = pos.st;
     tc *= mat2(0.5, 0.0, 0.0, 0.5);
     tc += vec2(0.5);
 
+    // -----------------------------------------------------
+    // get hsv of center pixel
+    // -----------------------------------------------------
     vec3 pixel = texture(shampler, tc).rgb;
-
     vec3 s = rgb2hsv(pixel);
 
-    mat2 sca = mat2(1.- (s.r*1.5), 0., 0., 1. - (s.r*1.5));
+    // -----------------------------------------------------
+    // scale/rotate texture coordinate based on hue
+    // -----------------------------------------------------
+    mat2 sca = mat2(1.- (s.r * 1.5), 0., 0., 1. - (s.r * 1.5));
 
     float angle = 0.015 * s.r;
 	mat2 rot = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
-    vec2 offs = vec2(1. / dims.x, 1. / dims.y);
 
     tc *= sca;
     tc *= rot;
-    vec2 src = tc;
 
-    float width = 1.980;
-    vec2 tc4 = src;
-    vec2 tc1 = src + vec2(0.0, -offs.t * width);
-    vec2 tc3 = src + vec2(-offs.s * width, 0.0);
-    vec2 tc5 = src + vec2(offs.s * width, 0.0);
-    vec2 tc7 = src + vec2(0.0, offs.t * width);
+    // -----------------------------------------------------
+    // 4 point convolution filter
+    // -----------------------------------------------------
+    float width = 1.0;
+    vec2 step = vec2(1. / dims.x, 1. / dims.y);
 
-    vec2 tc0 = src + vec2(-offs.s * width, -offs.t * width);
-    vec2 tc2 = src + vec2(offs.s * width, -offs.t * width);
-    vec2 tc6 = src + vec2(-offs.s * width, offs.t * width);
-    vec2 tc8 = src + vec2(offs.s * width, offs.t * width);
+    vec2 offs[4];
+    offs[0] = vec2(0.0, -step.t * width);
+    offs[1] = vec2(-step.s * width, 0.0);
+    offs[2] = vec2(step.s * width, 0.0);
+    offs[3] = vec2(0.0, step.t * width);
 
-    vec4 col0 = texture(shampler, tc0);
-    vec4 col1 = texture(shampler, tc1);
-    vec4 col2 = texture(shampler, tc2);
-    vec4 col3 = texture(shampler, tc3);
-    vec4 col4 = texture(shampler, tc4);
-    vec4 col5 = texture(shampler, tc5);
-    vec4 col6 = texture(shampler, tc6);
-    vec4 col7 = texture(shampler, tc7);
-    vec4 col8 = texture(shampler, tc8);
+    float kern[4];
+    kern[0] = 0.4;
+    kern[1] = 0.8;
+    kern[2] = 0.4;
+    kern[3] = 0.8;
 
-    // pass transformed pixel out with no convolution
-//    color = col4;
-    s.r+=0.001;
+    vec4 sum;
+    for (int i = 0; i < 4; i++) {
+        sum += texture(shampler, tc + offs[i]) * kern[i];
+    }
+    
+    // -----------------------------------------------------
+    // bitch craft
+    // -----------------------------------------------------
+    float d = dot(tc.yxxy, vec4(s, 0.23));
+    d *= dot(tc.xyyx, vec4(s * 3.50, 1.0));
+    // d *= 2.01;
+    d += 1.0;
 
-    float d = dot(pos, vec4(s, 0.23)) * dot(pos, vec4(s*3.50, 1.0));
-    // d = 1.0;
-//
-    // s.s += (d * 0.1);
-    // s.r -= (d * 0.1);
-//    color = vec4(hsv2rgb(s), 1.0);
-//    color = col2 + col4 + col6 + col8 + col0 * 0.1;
-    // color = vec4(hsv2rgb(s), 1.0) * (3.0*d) - (col1 + col3 + col5 + col7);
-    color = vec4(hsv2rgb(s), 1.0) * (3.0*d) - (col1 + col3 + col5 + col7);
+    // -----------------------------------------------------
+    // hue shift
+    // -----------------------------------------------------
+    s.r += (d * 0.01);
+
+    color = vec4(hsv2rgb(s), 1.0) * d - sum;
 }
