@@ -18,38 +18,74 @@ vec3 rgb2hsv(vec3 c) {
     return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
+vec3 hsv2rgb(vec3 color) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(color.xxx + K.xyz) * 6.0 - K.www);
+    vec3 rgb = vec3(color.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), color.y));
+
+    return rgb;
+}
+
 void main() {
-    // this is a hack to get proper texture coords from
-    // the position array, never wrote proper texcoords
-    // into my slab :/
+    // use screen position as texcoords
     vec2 tc = pos.st;
     tc *= mat2(0.5, 0.0, 0.0, 0.5);
     tc += vec2(0.5);
 
-    // constant zoom
-    float scale_factor = 0.998;
-
+    // constant zoom/rotate
+    float scale_factor = 0.995;
+    float fixangle = 0.001;
     tc -= vec2(0.5);
     tc *= mat2(scale_factor, 0.0, 0.0, scale_factor);
+    tc *= mat2(cos(fixangle), sin(fixangle), -sin(fixangle), cos(fixangle));
     tc += vec2(0.5);
 
+    // zoom/rotate based on hue/saturation
     vec3 pixel = texture(shampler, tc).rgb;
     vec3 s = rgb2hsv(pixel);
 
     float angle = ((tc.s + 0.4) * 0.04) * ((s.r * s.g) - 0.5);
-    angle *= 0.25;
-
-    float xscale = 1. + (-s.r * 0.0009);
-    float yscale = 1. + ( s.g * 0.0009);
+    angle *= 0.75;
 
     tc -= vec2(0.5);
     tc *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
     tc += vec2(0.5);
 
+    float xscale = 1. - (-s.r * 0.009);
+    float yscale = 1. - ( s.g * 0.009);
+
     tc -= vec2(0.5);
     tc *= mat2(xscale, 0., 0., yscale);
     tc += vec2(0.5);
 
+    // these aren't too different...
+    float d = dot(s.bg, tc);
+    float e = dot(s.rb, tc.ts);
+    // d = length(s.bg);
+    // d = 1.0;
 
-    color = texture(shampler, tc);
+    // get a neighboring pixel based on the above value
+    vec4 prelook = texture(shampler, tc + (d * 0.009));
+    
+    // don't look at me, idk man
+    d *= prelook.b;
+    d += length(prelook) / 4;
+    d -= length(s) / 4;
+
+    // final texture sample
+    vec4 bc_out = texture(shampler, tc + (d * 0.001)) * ((d * 0.001) + 1.0);
+
+    // shift hue and saturation
+    vec3 shift = s;
+    shift.r += (d / 100);
+    shift.g += (d * 0.04);
+
+    // mix between the shifted and repositioned values
+    color += mix(bc_out, vec4(hsv2rgb(shift), 1.0), 0.6);
+
+    // spatial differencing using intermediate pixel value (`prelook`)
+    color += 0.005;
+    // color *= 1.005;
+    color *= .99 + (e * .05); 
+    color -= (prelook * 0.02);
 }
