@@ -45,14 +45,14 @@ void main() {
     vec3 s = rgb2hsv(pixel);
 
     float angle = ((tc.s + 0.4) * 0.04) * ((s.r * s.g) - 0.5);
-    angle *= 0.75;
+    angle *= 0.375;
 
     tc -= vec2(0.5);
     tc *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
     tc += vec2(0.5);
 
-    float xscale = 1. - (-s.r * 0.009);
-    float yscale = 1. - ( s.g * 0.009);
+    float xscale = 1. - (-s.r * 0.0045);
+    float yscale = 1. - ( s.g * 0.0045);
 
     tc -= vec2(0.5);
     tc *= mat2(xscale, 0., 0., yscale);
@@ -81,7 +81,7 @@ void main() {
     shift.g += (d * 0.04);
 
     // mix between the shifted and repositioned values
-    color += mix(bc_out, vec4(hsv2rgb(shift), 1.0), 0.6);
+    color += mix(bc_out, vec4(hsv2rgb(shift), 1.0), -s.b);
 
     // spatial differencing using intermediate pixel value (`prelook`)
     color += 0.005;
