@@ -34,21 +34,35 @@ void main() {
     tc *= mat2(0.5, 0.0, 0.0, 0.5);
     tc += vec2(0.5);
 
-    vec3 pixel = texture(shampler, tc).rgb;
+    float spinamt = 0.004;
+    float scale_factor = (pos.s * spinamt) + 0.999;
+    scale_factor += (-pos.t * spinamt) ;
+    tc -= vec2(0.5);
+    tc *= mat2(scale_factor, 0.0, 0.0, scale_factor);
+    tc += vec2(0.5);
 
-    vec3 s = rgb2hsv(pixel);
+    vec3 s = rgb2hsv(texture(shampler, tc).rgb);
 
-    mat2 sca = mat2(1.- (s.r*1.05), 0., 0., 1. - (s.r*1.05));
+    float d = dot(abs(pos) * vec4(2.0), vec4(s, 0.1));
+    d *= 0.3;
 
-    float angle = 0.005 * s.b;
+    float e = dot(tc.yxxy, vec4(s, 0.23));
+    e *= dot(tc.xyyx, vec4(s * 3.50, 1.0));
+    e += 1.0;
+
+    float scale = (s.r * 1.005);
+    mat2 sca = mat2(1. - scale, 0., 0., 1. - scale);
+
+    float angle = 0.05 * s.b;
 	mat2 rot = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
     vec2 offs = vec2(1. / dims.x, 1. / dims.y);
 
     tc *= sca;
     tc *= rot;
+    tc -= (s.b * 0.01);
     vec2 src = tc;
 
-    float width = 1.980;
+    float width = 1;
     vec2 tc4 = src;
     vec2 tc1 = src + vec2(0.0, -offs.t * width);
     vec2 tc3 = src + vec2(-offs.s * width, 0.0);
@@ -69,16 +83,8 @@ void main() {
     vec4 col6 = texture(shampler, tc6);
     vec4 col7 = texture(shampler, tc7);
     vec4 col8 = texture(shampler, tc8);
+    vec4 kernel_sum = (col0 + col1 + col2 + col3 + col5 + col6 + col7 + col8) / (12.0 * (e * 0.05));
 
-    // pass transformed pixel out with no convolution
-//    color = col4;
-    //s.r+=0.003;
 
-    float d = dot(pos, vec4(s, 0.0));
-//
-    s.s += (d * 0.2);
-    s.r -= (d * 0.2);
-//    color = vec4(hsv2rgb(s), 1.0);
-//    color = col2 + col4 + col6 + col8 + col0 * 0.1;
-    color = vec4(hsv2rgb(s), 1.0) * (3.0*d) - (col1 + col3 + col5 + col7);
+    color = vec4(hsv2rgb(s), 1.0) * (0.9 - d) * 0.9 - kernel_sum;
 }
