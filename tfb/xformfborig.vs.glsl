@@ -1,8 +1,8 @@
 #version 410 core
 
-in vec2 position;
-in vec2 velocity;
-in vec2 originalPos;
+layout(location = 0) in vec2 position;
+layout(location = 1) in vec2 velocity;
+layout(location = 2) in vec2 originalPos;
 
 out vec2 outPosition;
 out vec2 outVelocity;
@@ -16,10 +16,10 @@ void main()
     vec2 newVelocity = originalPos - position;
 
     // ... unless the mouse is nearby. In that case, they move towards the mouse.
-    // if (length(mousePos - originalPos) < 0.75f) {
+    if (length(mousePos - originalPos) < 0.75f) {
         vec2 acceleration = 1.5f * normalize(mousePos - position);
         newVelocity = velocity + acceleration * time;
-    // }
+    }
     
     if (length(newVelocity) > 1.0f)
         newVelocity = normalize(newVelocity);
