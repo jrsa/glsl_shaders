@@ -33,7 +33,7 @@ void main() {
     tc += vec2(0.5);
 
     // constant zoom/rotate
-    float scale_factor = 0.995;
+    float scale_factor = 0.997 + ((pos.s * pos.t) / 80.);
     float fixangle = 0.001;
     tc -= vec2(0.5);
     tc *= mat2(scale_factor, 0.0, 0.0, scale_factor);
@@ -51,8 +51,8 @@ void main() {
     tc *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
     tc += vec2(0.5);
 
-    float xscale = 1. - (-s.r * 0.0045);
-    float yscale = 1. - ( s.g * 0.0045);
+    float xscale = 1. - (-s.r * 0.0085);
+    float yscale = 1. - ( s.g * 0.0085);
 
     tc -= vec2(0.5);
     tc *= mat2(xscale, 0., 0., yscale);
@@ -69,23 +69,23 @@ void main() {
     
     // don't look at me, idk man
     d *= prelook.b;
-    d += length(prelook) / 4;
-    d -= length(s) / 4;
+    d += length(prelook) / 4.0;
+    d -= length(s) / 4.0;
 
     // final texture sample
     vec4 bc_out = texture(shampler, tc + (d * 0.001)) * ((d * 0.001) + 1.0);
 
     // shift hue and saturation
     vec3 shift = s;
-    shift.r += (d / 100);
+    shift.r += (d / 100.0);
     shift.g += (d * 0.04);
 
     // mix between the shifted and repositioned values
-    color += mix(bc_out, vec4(hsv2rgb(shift), 1.0), -s.b);
+    color += mix(bc_out, vec4(hsv2rgb(shift), 1.0), (-s.b * 0.66) + s.g);
 
     // spatial differencing using intermediate pixel value (`prelook`)
     color += 0.005;
-    // color *= 1.005;
-    color *= .99 + (e * .05); 
-    color -= (prelook * 0.02);
+    color *= 1.005;
+    color *= .98 + (e * .03);
+    color -= (prelook * 0.01);
 }
