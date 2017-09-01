@@ -18,6 +18,7 @@ void main() {
     vec2 src = tc;
 
     float width = 1.0;
+    width = .1;
     vec2 tc4 = src;
     vec2 tc1 = src + vec2(0.0, -offs.t * width);
     vec2 tc3 = src + vec2(-offs.s * width, 0.0);
@@ -43,5 +44,6 @@ void main() {
 //    color = texture(shampler, tc);
 
     color = (col4 + col1 + col3 + col5 + col7) * 0.2;
+    // color = (col4 + col2 + col0 + col6 + col8) * 0.2;
 //    color = col4 * 4.1 - (col1 + col3 + col5 + col7);
 }
