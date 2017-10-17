@@ -33,35 +33,34 @@ void main() {
     tc += vec2(0.5);
 
     // constant zoom/rotate
-    float scale_factor = 0.995;
-    float fixangle = 0.002;
+    float scale_factor = 0.997;
+    float fixangle = -0.001;
     tc -= vec2(0.5);
     tc *= mat2(scale_factor, 0.0, 0.0, scale_factor);
     tc *= mat2(cos(fixangle), sin(fixangle), -sin(fixangle), cos(fixangle));
     tc += vec2(0.5);
 
-    // zoom/rotate based on hue/saturation
     vec3 pixel = texture(shampler, tc).rgb;
     vec3 s = rgb2hsv(pixel);
 
-    // these aren't too different...
-    float d = dot(s.bg, tc);
-    float e = dot(s.rb, tc.ts);
-    d = length(s.bg);
-    // d = 1.0;
+    float d = length(s.bg);
+    float e = length(s.rb);
 
     // get a neighboring pixel based on the above value
-    vec4 prelook = texture(shampler, tc + (d * 0.3));
+    float prelook_amount = 1.0;
+    vec4 prelook = texture(shampler, tc + vec2(-d * prelook_amount, -e * prelook_amount));
     
     // don't look at me, idk man
-    // d *= prelook.b;
-    // d += length(prelook) / 4;
+    d *= prelook.b;
+    d += length(prelook) / 4;
     d -= length(s) / 4;
 
-    color = texture(shampler, tc + (d * 0.001)) * ((d * 0.001) + 1.0);;
+    // second texture fetch which we will use for the output
+    float displace_amount = 0.001;
+    color = texture(shampler,  tc + vec2(d * displace_amount, e * displace_amount));
 
     // spatial differencing using intermediate pixel value (`prelook`)
-    color += 0.005; // feedback dies without this
-    color *= .99 + (e * .025); 
-    color -= (prelook * 0.02);
+    color += 0.0175;
+    color.r += 0.0175;
+    color -= (prelook * 0.04);
 }
