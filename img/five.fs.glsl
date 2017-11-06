@@ -3,9 +3,6 @@
 in vec4 pos;
 out vec4 color;
 
-uniform vec2 dims;
-uniform float width;
-
 uniform sampler2D shampler;
 
 vec3 rgb2hsv(vec3 c) {
@@ -16,14 +13,6 @@ vec3 rgb2hsv(vec3 c) {
     float d = q.x - min(q.w, q.y);
     float e = 1.0e-10;
     return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
-
-vec3 hsv2rgb(vec3 color) {
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(color.xxx + K.xyz) * 6.0 - K.www);
-    vec3 rgb = vec3(color.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), color.y));
-
-    return rgb;
 }
 
 void main() {
