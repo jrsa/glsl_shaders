@@ -3,9 +3,6 @@
 in vec4 pos;
 out vec4 color;
 
-uniform vec2 dims;
-uniform float width;
-
 uniform sampler2D shampler;
 
 vec3 rgb2hsv(vec3 c) {
@@ -18,14 +15,6 @@ vec3 rgb2hsv(vec3 c) {
     return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
-vec3 hsv2rgb(vec3 color) {
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(color.xxx + K.xyz) * 6.0 - K.www);
-    vec3 rgb = vec3(color.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), color.y));
-
-    return rgb;
-}
-
 void main() {
     // use screen position as texcoords
     vec2 tc = pos.st;
@@ -33,12 +22,14 @@ void main() {
     tc += vec2(0.5);
 
     // constant zoom/rotate
-    float scale_factor = 0.997;
-    float fixangle = -0.001;
+    float scale_factor = 0.991;
+    float fixangle = 0.001;
     tc -= vec2(0.5);
-    tc *= mat2(scale_factor, 0.0, 0.0, scale_factor);
-    tc *= mat2(cos(fixangle), sin(fixangle), -sin(fixangle), cos(fixangle));
+    // tc *= mat2(scale_factor, 0.0, 0.0, scale_factor);
+    // tc *= mat2(cos(fixangle), sin(fixangle), -sin(fixangle), cos(fixangle));
     tc += vec2(0.5);
+
+    tc -= vec2(1.0 / 3200.0, 1.0 / 1200.0); // offset displace amount below
 
     vec3 pixel = texture(shampler, tc).rgb;
     vec3 s = rgb2hsv(pixel);
@@ -47,7 +38,7 @@ void main() {
     float e = length(s.rb);
 
     // get a neighboring pixel based on the above value
-    float prelook_amount = 1.0;
+    float prelook_amount = 1.87;
     vec4 prelook = texture(shampler, tc + vec2(-d * prelook_amount, -e * prelook_amount));
     
     // don't look at me, idk man
@@ -60,7 +51,6 @@ void main() {
     color = texture(shampler,  tc + vec2(d * displace_amount, e * displace_amount));
 
     // spatial differencing using intermediate pixel value (`prelook`)
-    color += 0.0175;
-    color.r += 0.0175;
+    color += 0.0175 * vec4(1.0, 1.23, 1.0, 0.0);
     color -= (prelook * 0.04);
 }

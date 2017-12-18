@@ -36,15 +36,8 @@ void main() {
     vec3 hsv = rgb2hsv(src.rgb);
 
     // hue
-    hsv.r *= 0.2;
-    hsv.r += (hsv.g * 0.2) + 0.2;
+    hsv.r -= (0.5/59.0);
 
-    // saturation
-    hsv.g = 1.0;
-    
-    // value
-    hsv.b *= 1.0;
-
-    color = vec4(hsv2rgb(hsv), src.r/src.b/src.g);
+    color = vec4(hsv2rgb(hsv), 1.0);
     // color = src;
 }
