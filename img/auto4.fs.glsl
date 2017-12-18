@@ -51,6 +51,6 @@ void main() {
     color = texture(shampler,  tc + vec2(d * displace_amount, e * displace_amount));
 
     // spatial differencing using intermediate pixel value (`prelook`)
-    color += 0.0175 * vec4(1.0, 1.23, 1.0, 0.0);
+    color += 0.0175 * vec4(0.27, 0.1, 1.0, 0.0);
     color -= (prelook * 0.04);
 }
