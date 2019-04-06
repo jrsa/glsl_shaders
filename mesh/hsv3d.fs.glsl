@@ -1,8 +1,11 @@
-#version 410 core
+#version 330 core
 
-in vec2 outPosition;
-in vec2 outVelocity;
-out vec4 outColor;
+in vec4 prePos;
+in vec4 postPos;
+out vec4 color;
+
+uniform float time;
+uniform vec2 mouse;
 
 vec3 hsv2rgb(vec3 color) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -12,9 +15,7 @@ vec3 hsv2rgb(vec3 color) {
     return rgb;
 }
 
-void main()
-{
-    float hue = (outVelocity.x * 0.5) + 0.2;
-    float sat = length(outVelocity);
-    outColor = vec4(hsv2rgb(vec3(hue, sat, 1.0)), 1.0);
+void main() {
+    color = vec4(hsv2rgb(vec3((prePos.xyz + 1.0) / 2.0)), 1.0);
+    // color = vec4(1.0, 0.0, 0.0, 1.0);
 }

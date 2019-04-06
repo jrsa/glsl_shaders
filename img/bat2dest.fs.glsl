@@ -84,7 +84,7 @@ void main() {
     maptc *= mat2(scale, 0., 0., scale);
 
     // MAP gOFFSET
-    maptc -= 2.11; 
+    maptc += 2.11; 
     vec4 grad = vec4(maptc.s, maptc.t, 0.0, 1.0);
 
     float d = dot(grad, vec4(s, 0.23)) * dot(grad, vec4(s * 3.50, 1.0));

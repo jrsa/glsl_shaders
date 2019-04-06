@@ -14,9 +14,9 @@ uniform vec2 mousePos;
 
 void main()
 {
-    vec2 mousePos = mousePos;
-    mousePos = vec2(0.0, 0.0);
-    mousePos *= noise2(originalPos);
+    // vec2 mousePos = mousePos;
+    // mousePos = vec2(0.0, 0.0);
+    // mousePos *= noise2(originalPos);
 
     vec2 newVelocity = originalPos - position;
 

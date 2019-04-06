@@ -36,17 +36,17 @@ void main() {
     vec3 hsv = rgb2hsv(src.rgb);
 
     // hue
-    // hsv.r *= 0.2;
-    // hsv.r += (hsv.g * 0.2) + 0.7;
+    hsv.r *= 0.2;
+    hsv.r += sqrt(hsv.g * 1.2) + .7;
+    
+    // value
+    hsv.b -= hsv.g;
 
     // saturation
-    // hsv.g = 1.;
+    hsv.g = 0.;
 
     // hsv.r *= 0.7;
     // hsv.r += 0.7;
-    
-    // value
-    // hsv.b *= 1.0;
 
     color = vec4(hsv2rgb(hsv), 1.0);
     // color = vec4(1.0) - color;

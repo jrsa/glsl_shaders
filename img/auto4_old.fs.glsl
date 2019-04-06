@@ -34,7 +34,7 @@ void main() {
 
     // constant zoom/rotate
     float scale_factor = 0.995;
-    float fixangle = 0.001;
+    float fixangle = 0.002;
     tc -= vec2(0.5);
     tc *= mat2(scale_factor, 0.0, 0.0, scale_factor);
     tc *= mat2(cos(fixangle), sin(fixangle), -sin(fixangle), cos(fixangle));
@@ -44,51 +44,24 @@ void main() {
     vec3 pixel = texture(shampler, tc).rgb;
     vec3 s = rgb2hsv(pixel);
 
-    float angle = ((tc.s + 0.4) * 0.04) * ((s.r * s.g) - 0.5);
-    angle *= 0.275;
-
-    tc -= vec2(0.5);
-    tc *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
-    tc += vec2(0.5);
-
-    float xscale = 1. - (-fract(s.r*69.0) * 0.009);
-    float yscale = 1. - ( s.g * 0.009);
-
-    tc -= vec2(0.5);
-    tc *= mat2(xscale, 0., 0., yscale);
-    tc += vec2(0.5);
-
     // these aren't too different...
-    float d = fract(distance(s.bg, tc));
-    float e = fract(length(s.rb) * d);
-    // d = length(s.bg);
+    float d = dot(s.bg, tc);
+    float e = dot(s.rb, tc.ts);
+    d = length(s.bg);
     // d = 1.0;
-
-    d = fract(d);
 
     // get a neighboring pixel based on the above value
     vec4 prelook = texture(shampler, tc + (d * 0.3));
     
     // don't look at me, idk man
-    d *= prelook.b;
-    d += length(prelook) / 4;
+    // d *= prelook.b;
+    // d += length(prelook) / 4;
     d -= length(s) / 4;
 
-    // final texture sample
-    vec4 bc_out = texture(shampler, tc + (d * 0.001)) * ((d * 0.001) + 1.0);
-
-    // shift hue and saturation
-    vec3 shift = s;
-    shift.r += (d / 10);
-    shift.g += (d * 0.08);
-
-    // mix between the shifted and repositioned values
-    float q = 40.0 * (-s.g);
-    color += mix(bc_out, vec4(hsv2rgb(shift), 1.0), 0.6 - (floor(s.g * q))/q);
+    color = texture(shampler, tc + (d * 0.001)) * ((d * 0.001) + 1.0);;
 
     // spatial differencing using intermediate pixel value (`prelook`)
-    // color += 0.005;
-    // color *= 1.005;
-    // color *= .99 + (e * .015); 
-    color -= (prelook * 0.01);
+    color += 0.005; // feedback dies without this
+    color *= .99 + (e * .025); 
+    color -= (prelook * 0.02);
 }

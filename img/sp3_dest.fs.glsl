@@ -34,6 +34,8 @@ void main() {
     tc *= mat2(0.5, 0.0, 0.0, 0.5);
     tc += vec2(0.5);
 
+    tc += 0.0001;
+
     vec3 pixel = texture(shampler, tc).rgb;
     vec3 pixel_hsv = rgb2hsv(pixel);
 
@@ -70,10 +72,10 @@ void main() {
     pixel_hsv.r += 0.0169;
 
     vec2 pos_factor = pos.yx;
-    float shrink = 1.3;
-    pos_factor -= shrink;
+    float shrink = 0.1;
+    // pos_factor -= shrink;
     pos_factor *= mat2(shrink, 0.0, 0.0, shrink);
-    pos_factor += shrink;
+    // pos_factor += shrink;
 
     // angle = 0.0;
     // pos_factor *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
@@ -84,16 +86,18 @@ void main() {
     float d = dot(vec4(pos_factor, pos.zw), vec4(pixel_hsv, 0.23));
     d *= dot(vec4(pos_factor, pos.zw), vec4(pixel_hsv*3.50, 1.0));
 
+    d = 0.46;
+
 //     float d = pos.y + 1.39;
-    d*= 1.9;
-    pixel_hsv.r += (d * 0.004);
+    // d*= 1.9;
+    // pixel_hsv.r += (d * 0.004);
    // pixel_hsv.r -= (d * 0.4);
 //    color = vec4(hsv2rgb(pixel_hsv), 1.0);
 //    color = col2 + col4 + col6 + col8 + col0 * 0.1;
 //    color = vec4(hsv2rgb(pixel_hsv), 1.0) * (6.3*d) - (col1 + col3 + col5 + col7);
 
     // float amp = 1.0;
-    float amp = 24.0;
+    float amp = 29.0;
     color += vec4(hsv2rgb(pixel_hsv), 1.0) * (d*2.5) - ((col1 + col3 + col5 + col7) / amp);
     // color += 0.2*(-pixel_hsv.g);
 
