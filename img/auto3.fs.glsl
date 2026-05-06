@@ -84,6 +84,7 @@ void main() {
 
     // mix between the shifted and repositioned values
     float q = 40.0 * (-s.g);
+    color = vec4(0.0, 0.0, 0.0, 1.0);
     color += mix(bc_out, vec4(hsv2rgb(shift), 1.0), 0.6 - (floor(s.g * q))/q);
 
     // spatial differencing using intermediate pixel value (`prelook`)
