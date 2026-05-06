@@ -4,6 +4,7 @@ in vec4 pos;
 out vec4 color;
 
 uniform vec2 dims;
+uniform vec2 mouse;
 uniform float width;
 
 uniform sampler2D shampler;
@@ -81,6 +82,7 @@ void main() {
     shift.g += (d * 0.04);
 
     // mix between the shifted and repositioned values
+    color = vec4(0.0, 0.0, 0.0, 1.0);
     color += mix(bc_out, vec4(hsv2rgb(shift), 1.0), (-s.b * 0.66) + s.g);
 
     // spatial differencing using intermediate pixel value (`prelook`)

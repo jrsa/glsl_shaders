@@ -14,5 +14,5 @@ vec3 hsv2rgb(vec3 color) {
 
 void main()
 {
-    outColor = vec4(hsv2rgb(vec3(dist, 1.0 , 1.0)), 1.0);
+    outColor = vec4(hsv2rgb(vec3(dist, 1.0 , sqrt(length(outVelocity)))), 1.0);
 }

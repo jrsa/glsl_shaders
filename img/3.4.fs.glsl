@@ -95,6 +95,7 @@ void main() {
 
     float amp = 23.0;
     // float amp = 18.0;
+    color = vec4(0.0, 0.0, 0.0, 1.0);
     color += vec4(hsv2rgb(pixel_hsv), 1.0) * (d*2.5) - ((col1 + col3 + col5 + col7) / amp);
     //color += 0.2*(-pixel_hsv.g);
 }
